@@ -5,20 +5,46 @@
 	<meta charset= "utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" type="text/css" href="style/index.css">
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+	</script>
 </head>
 <body>
 
-  <form method= "post" action="home.html" class="container">
+  <div class="container">
     <h1>Login</h1>
 
     <label for="name"><b>Email</b></label>
-    <input type="text" placeholder="Enter email" name="email" required>
+    <input type="text" placeholder="Enter email" name="email" id="email" required>
 
     <label for="psw"><b>Password</b></label>
-    <input type="password" placeholder="Enter Password" name="wachtwoord" required>
+    <input type="password" placeholder="Enter Password" name="password" id="password" required>
 
-    <button type="submit" name= "login_submit" class="btn">Login</button>
-  </form>
+    <input type="button" id="login_submit" class="btn" value="Login">
+  </div>
 
 </body>
 </html>
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    $("#login_submit").click(function(){
+      var email = $('#email').val().trim();
+      var password = $('#password').val().trim();
+        $.ajax({
+          url:'http://localhost:8080/user/login',
+          type:'get',
+					data:{email:email,password:password},
+          success:function(response){
+            var msg = "";
+						sessionStorage.setItem('loggedInUser',JSON.stringify(response));
+            window.location = "home.html";
+            $("#message").html(msg);
+          },
+          error: function(error){
+						alert("Wrong email and password combination");
+          }
+        });
+    });
+  });
+</script>
