@@ -4,6 +4,7 @@
 	<meta charset= "utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" type="text/css" href="style/search.css">
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
 
@@ -18,36 +19,14 @@
     <label id="name" for="name">Kimberly van Gelder</label>
     <hr>
 
-    <form action="">
-        <input type="text" class="search" placeholder="Search with name">
-        <input type="submit" class="submit" value="Search">
-    </form>
+    <div id="searchBalk">
+        <input type="text" class="search" id="searchName" placeholder="Search with name">
+        <input type="submit" class="submit" id="search" value="Search">
+    </div>
 
     <div class="flex-container">
         <div class="box">
-            <div class="block">
-                <h3 id="text1">Hayo Bos</h3>
-                <hr>
-                <p>hayotbos@gmail.com</p>
-                <!-- <p>NL50 BLUE 0987 7654 54</p> -->
-                <p >Customer</p>
-            </div>
-            <div class="block">
-                <h3 id="text1">njesadf</h3>
-                <hr>
-                <p>hayotbos@gmail.com</p>
-                <!--<p>NL50 BLUE 0987 7654 54</p>-->
-                <p >Customer</p>
-            </div>
-        </div>
-        <div class="box">
-            <div class="block">
-                <h3 id="text1">njesadf</h3>
-                <hr>
-                <p>hayotbos@gmail.com</p>
-                <!-- <p>NL50 BLUE 0987 7654 54</p> -->
-                <p >Customer</p>
-            </div>
+            <div id="info"></div>
         </div>
     </div>
 
@@ -55,3 +34,44 @@
 
 </body>
 </html>
+<script type="text/javascript">
+  $(document).ready(function(){
+
+    $("#search").click(function(){
+      var name = $('#searchName').val().trim();
+				$.ajax({
+          url:'http://localhost:8080/users/search',
+          type:'get',
+					data:{name:name},
+					contentType: "application/json",
+					dataType:"json",
+          success:function(response){
+            var msg = "";
+						$.each(response,function(index){
+							fillData(response[index]);
+						});
+          },
+          error: function(error){
+						alert("No user found with that name");
+          }
+        });
+    });
+  });
+
+	function fillData(Users)
+	{
+		var html =  `<div class="block">
+										<h3>`	+ Users.firstname + " " + Users.lastname+`</h3>
+										<hr>
+										<p>`	+ Users.email +`</p>
+										<p>`	+ Users.typeofuser +`</p>
+										<button id="`	+ Users.id +`" class="btn">Check user information</button>
+								</div>`
+		$("#info").append(html);
+
+		document.getElementById(Users.id).addEventListener("click",function(){
+				sessionStorage.setItem('searchedUser',JSON.stringify(Users));
+				window.location = "userInformation.html";
+		});
+	}
+</script>
