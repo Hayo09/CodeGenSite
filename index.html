@@ -25,6 +25,7 @@
 
 <script type="text/javascript">
   $(document).ready(function(){
+		sessionStorage.clear();
     $("#login_submit").click(function(){
       var email = $('#email').val().trim();
       var password = $('#password').val().trim();
@@ -47,7 +48,11 @@
 
 	function checkUser(User)
 	{
-		if(User.typeofuser == "customer"){
+		if (User.isactive == false){
+			alert("This user has been deactivated, please contact customer service.");
+			location.reload();
+		}
+		else if(User.typeofuser == "customer"){
 			window.location = "home.html";
 		}
 		else if (User.typeofuser == "employee") {

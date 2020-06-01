@@ -16,7 +16,7 @@
       <img src="style/logout.png" class="logout">
     </a>
 
-    <label id="name" for="name">Kimberly van Gelder</label>
+    <p id="name" for="name"></p>
     <hr>
 
     <div id="info" class="box">
@@ -62,6 +62,8 @@
 </body>
 </html>
 <script type="text/javascript">
+	var loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
+	$('#name').text(loggedInUser.firstname + " " + loggedInUser.lastname);
 
 	var searchedUser = JSON.parse(sessionStorage.getItem("searchedUser"));
 	$('#userFirstName').text("First name: "+searchedUser.firstname);

@@ -16,7 +16,7 @@
       <img src="style/logout.png" class="logout">
     </a>
 
-    <label id="name" for="name">Kimberly van Gelder</label>
+    <p id="name" for="name"></p>
     <hr>
 
     <div id="searchBalk">
@@ -35,6 +35,9 @@
 </body>
 </html>
 <script type="text/javascript">
+	var loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
+	$('#name').text(loggedInUser.firstname + " " + loggedInUser.lastname);
+	
   $(document).ready(function(){
 
     $("#search").click(function(){
