@@ -24,9 +24,8 @@
         <h3 id="text1">Saving transactions</h3>
 				<hr>
 				<div Class="scrollTransaction">
-					<div Class="transactions">
-						<p id="transaction" for = "transaction"></p>
-				</div>
+					<div id = "transactionview" >
+				  </div>
 				</div>
       </div>
     </div>
@@ -41,7 +40,7 @@
 			<hr>
 			<p id="nameChecking" for = "nameChecking"></p>
 			<p id="IBANChecking" for = "IBANChecking"></p>
-			<p id="money">€77,90</p>
+			<p id="moneyChecking"></p>
 		</div>
 
 		<div id="transaction" class="block">
@@ -51,7 +50,7 @@
 			<hr>
 			<p id="nameSaving" for = "nameSaving"></p>
 			<p id="IBANSaving" for = "IBANSaving"></p>
-			<p id="money">€230,55</p>
+			<p id="moneySaving"></p>
 
 		</div>
 
@@ -62,36 +61,86 @@
 </html>
 
 <script type="text/javascript">
-var loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
-$('#name').text(loggedInUser.firstname + " " + loggedInUser.lastname);
-$('#nameChecking').text(loggedInUser.firstname + " " + loggedInUser.lastname);
-$('#nameSaving').text(loggedInUser.firstname + " " + loggedInUser.lastname);
-$('#transaction').text(showSavings);
+	var loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
+	$('#name').text(loggedInUser.firstname + " " + loggedInUser.lastname);
+	$('#nameChecking').text(loggedInUser.firstname + " " + loggedInUser.lastname);
+	$('#nameSaving').text(loggedInUser.firstname + " " + loggedInUser.lastname);
 
-$(document).ready(function(){
-								$.ajax({
-										url:'http://localhost:8080/transaction/',
-										type:'get',
-										data:{userId:loggedInUser.id},
-										contentType: "application/json",
-										dataType:"json",
-										success:function(response){
-												$.each(response,function(index){
-													showSavings(response[index]);
-												});
-										},
-										error: function(error){
-												alert("There was an error try again");
-										}
-								});
-		});
+	$(document).ready(function(){
+									$.ajax({
+											url:'http://localhost:8080/account/listaccount',
+											type:'get',
+											data:{userId:loggedInUser.id},
+											contentType: "application/json",
+											dataType:"json",
+											success:function(response){
+													$.each(response,function(index){
+														 showBalance(response[index]);
+													});
+											},
+											error: function(error){
+													alert("There was an error try again");
+											}
+									});
+			});
 
-		function showSavings(transaction)
-		{
-			var html = '<div class="block1">
-									<h3>' + transaction.by + '</h3>
-									<p>'+ transaction.amount + '</p>
-									</div>'
-			$("info").append(html);
-		}
+			$(document).ready(function(){
+											$.ajax({
+													url:'http://localhost:8080/transaction/user/' + loggedInUser.id,
+													type:'get',
+													contentType: "application/json",
+													dataType:"json",
+													success:function(response){
+															$.each(response,function(index){
+														showTransaction(response[index]);
+															});
+													},
+													error: function(error){
+															alert("There was an error try again");
+													}
+											});
+					});
+
+
+	function showBalance (account) {
+
+							if (account.typeofaccount == "saving")
+							{
+								$('#IBANSaving').text(account.iban);
+								$('#moneySaving').text("€" + account.balance);
+
+							} else if (account.typeofaccount == "deposit") {
+								$('#IBANChecking').text(account.iban);
+								$('#moneyChecking').text("€" + account.balance);
+							} else
+							{
+								alert("no bank info to show");
+							}
+	}
+
+	function showTransaction(transaction)
+	{
+			if (transaction.sender.typeofaccount == "saving")
+			{
+					var html = `<div Class="transactions">
+											<p>`+ transaction.date + `</p>
+											<p>`+ "to: " + transaction.receiver.iban + `</p>
+					 						<p>` + "-" + transaction.amount + `</p>
+											</div>`
+					$('#transactionview').append(html);
+			} else if (transaction.receiver.typeofaccount == "saving")
+			{
+				var html = `<div Class="transactions">
+										<p>`+ transaction.date + `</p>
+										<p>`+ "from: " + transaction.sender.iban + `</p>
+										<p> ` + "+" + transaction.amount + `</p>
+										</div>`
+				$('#transactionview').append(html);
+			} else
+			{
+					alert("no transactions found");
+			}
+
+
+	}
 </script>
