@@ -43,8 +43,8 @@
         <h3 id="text1">Checking</h3>
 				</a>
 				<hr>
-        <p>Kimberly van Gelder</p>
-        <p>NL50 BLUE 0987 7654 54</p>
+				<p id="nameChecking" for = "nameChecking"></p>
+        <p id="IBANChecking" for = "IBANChecking"></p>
         <p id="money">€77,90</p>
       </div>
 
@@ -53,8 +53,8 @@
         <h3 id="text1">Saving</h3>
 			</a>
         <hr>
-        <p>Kimberly van Gelder</p>
-        <p>NL50 BLUE 0987 7654 55</p>
+        <p id="nameSaving" for = "nameSaving"></p>
+        <p id="IBANSaving" for = "IBANSaving"></p>
         <p id="money">€230,55</p>
 
       </div>
@@ -68,4 +68,33 @@
 <script type="text/javascript">
 	var loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
 	$('#name').text(loggedInUser.firstname + " " + loggedInUser.lastname);
+	$('#nameChecking').text(loggedInUser.firstname + " " + loggedInUser.lastname);
+	$('#nameSaving').text(loggedInUser.firstname + " " + loggedInUser.lastname);
+
+	$(document).ready(function(){
+									$.ajax({
+											url:'http://localhost:8080/account/listaccount/',
+											type:'get',
+											data:{userId:loggedInUser.id},
+											contentType: "application/json",
+											dataType:"json",
+											success:function(response){
+												alert("first yay!");
+													$.each(response,function(index){
+														 showBalance(response[index]);
+													});
+											},
+											error: function(error){
+													alert("There was an error try again");
+											}
+									});
+			});
+
+	function showBalance (account) {
+		var html '<div class = "block">
+							<p>' account.iban +'</p>
+							<p>' account.balance +'</p>
+							</div>
+				$("info").append(html);
+	}
 </script>

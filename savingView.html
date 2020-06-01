@@ -25,63 +25,73 @@
 				<hr>
 				<div Class="scrollTransaction">
 					<div Class="transactions">
-						<p>NL17 INHO 7648 9085 53 </p>
-						<p>Kimberly: +€25,95</p>
+						<p id="transaction" for = "transaction"></p>
 				</div>
-				<div Class="transactions">
-					<p>NL17 INHO 7648 9085 53 </p>
-					<p>Kimberly: +€25,95</p>
-				</div>
-				<div Class="transactions">
-					<p>NL17 INHO 7648 9085 53 </p>
-					<p>Kimberly: +€25,95</p>
-				</div>
-				<div Class="transactions">
-					<p>NL17 INHO 7648 9085 53 </p>
-					<p>Kimberly: +€25,95</p>
-				</div>
-				<div Class="transactions">
-					<p>NL17 INHO 7648 9085 53 </p>
-					<p>Kimberly: +€25,95</p>
-				</div>
-				<div Class="transactions">
-					<p>NL17 INHO 7648 9085 53 </p>
-					<p>Kimberly: +€25,95</p>
 				</div>
       </div>
     </div>
-	</div>
 
-    <div class="vl"></div>
-    <div id="accounts" class="box">
-      <div class="block">
-				<a href="transactionView.html">
-        <h3 id="text1">Checking</h3>
-				</a>
-				<hr>
-        <p>Kimberly van Gelder</p>
-        <p>NL50 BLUE 0987 7654 54</p>
-        <p id="money">€77,90</p>
-      </div>
+	<div class="vl"></div>
+	<div id="accounts" class="box">
 
-      <div id="transaction" class="block">
-				<a href="savingView.html">
-        <h3 id="text1">Saving</h3>
+		<div class="block">
+			<a href="transactionView.html">
+			<h3 id="text1">Checking</h3>
 			</a>
-        <hr>
-        <p>Kimberly van Gelder</p>
-        <p>NL50 BLUE 0987 7654 55</p>
-        <p id="money">€230,55</p>
+			<hr>
+			<p id="nameChecking" for = "nameChecking"></p>
+			<p id="IBANChecking" for = "IBANChecking"></p>
+			<p id="money">€77,90</p>
+		</div>
 
-      </div>
+		<div id="transaction" class="block">
+			<a href="savingView.html">
+			<h3 id="text1">Saving</h3>
+		</a>
+			<hr>
+			<p id="nameSaving" for = "nameSaving"></p>
+			<p id="IBANSaving" for = "IBANSaving"></p>
+			<p id="money">€230,55</p>
 
-    </div>
-  </div>
+		</div>
+
+	</div>
+</div>
 
 </body>
 </html>
 
 <script type="text/javascript">
-	var loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
-	$('#name').text(loggedInUser.firstname + " " + loggedInUser.lastname);
+var loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
+$('#name').text(loggedInUser.firstname + " " + loggedInUser.lastname);
+$('#nameChecking').text(loggedInUser.firstname + " " + loggedInUser.lastname);
+$('#nameSaving').text(loggedInUser.firstname + " " + loggedInUser.lastname);
+$('#transaction').text(showSavings);
+
+$(document).ready(function(){
+								$.ajax({
+										url:'http://localhost:8080/transaction/',
+										type:'get',
+										data:{userId:loggedInUser.id},
+										contentType: "application/json",
+										dataType:"json",
+										success:function(response){
+												$.each(response,function(index){
+													showSavings(response[index]);
+												});
+										},
+										error: function(error){
+												alert("There was an error try again");
+										}
+								});
+		});
+
+		function showSavings(transaction)
+		{
+			var html = '<div class="block1">
+									<h3>' + transaction.by + '</h3>
+									<p>'+ transaction.amount + '</p>
+									</div>'
+			$("info").append(html);
+		}
 </script>
