@@ -4,6 +4,7 @@
 	<meta charset= "utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" type="text/css" href="style/search.css">
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
 
@@ -15,43 +16,98 @@
       <img src="style/logout.png" class="logout">
     </a>
 
-    <label id="name" for="name">Kimberly van Gelder</label>
+    <p id="name" for="name"></p>
     <hr>
 
-    <form action="">
-        <input type="text" class="search" placeholder="Search with name">
-        <input type="submit" class="submit" value="Search">
+    <form id="searchBar">
+        <input type="text" class="search" id="accountIban" placeholder="Search with Iban">
+        <input type="submit" class="submit" id="search" value="Search">
     </form>
 
     <div class="flex-container">
         <div class="box">
-            <div class="block">
-                <h3 id="text1">Deposit</h3>
-                <hr>
-                <p>Kimberly van Gelder</p>
-                <p>NL50 BLUE 0987 7654 54</p>
-                <p>€77,90</p>
-            </div>
-            <div class="block">
-                <h3 id="text1">njesadf</h3>
-                <hr>
-                <p>Hayo Bos</p>
-                <p>NL50 BLUE 0987 9456 54</p>
-                <p >€745,00</p>
-            </div>
-        </div>
-        <div class="box">
-            <div class="block">
-                <h3 id="text1">njesadf</h3>
-                <hr>
-                <p>Henk Pieters</p>
-                <p>NL50 BLUE 0987 1423 44</p>
-                <p >2231,44</p>
-            </div>
-        </div>
-    </div>
-
-  </div>
+            <div id="info"></div>
+    		</div>
+  	</div>
+	</div>
 
 </body>
 </html>
+
+<script type="text/javascript">
+	var loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
+	$('#name').text(loggedInUser.firstname + " " + loggedInUser.lastname);
+
+	$(document).ready(function() {
+		$("#search").click(function(){
+
+			var iban = $('#accountIban').val().trim();
+				$.ajax({
+					url: 'http://localhost:8080/account/{' + iban + '}',
+					type:'get',
+					data:{iban:iban},
+					contentType:"application/json",
+					dataType:"json",
+					success:function(response){
+						var message = "";
+							fillData(response);
+					},
+					error: function(error){
+						alert("No account found with that Iban")
+					}
+				});
+		});
+	});
+
+	function fillData(account)
+	{
+		if (account.typeofaccount == "deposit"){
+			var type = "Checking";
+		}
+		else if(account.typeofaccount == "saving"){
+			var type = "Savings";
+		}
+		var html = `<div class="block">
+										<h3>` + type + `</h3>
+										<hr>
+										` + getNames(account) +`
+										<p>Iban: ` + account.iban +`</p>
+										<p>Balance: ` + account.balance +`</p>
+										<button id="` + account.userid + `" class="btn">Check transactions</button>
+								</div>`
+		$("#info").append(html);
+		// Using getNames function to retrieve first and last name of account holder through the saved
+		// userID in account object
+		document.getElementById(account.userid).addEventListener("click",function(){
+			sessionStorage.setItem('foundAccount', JSON.stringify(account));
+			window.location = "transactionView.html";
+		});
+	}
+
+	function getNames(account)
+	{
+		var names = "<p>Account holder: ";
+		var userid = account.userid;
+			$.ajax({
+				url:'http://localhost:8080/users/' + account.userid,
+				type:'get',
+				async: false,
+				contentType: "application/json",
+				dataType:"json",
+				success:function(response){
+					var msg = "";
+					names += fillNames(response);
+				},
+				error: function(error){
+					alert("No user found with that name");
+				}
+			});
+			names += "</p>";
+			return names;
+	}
+
+	function fillNames(user){
+		var names = user.firstname + " " + user.lastname;
+		return names;
+	}
+</script>
