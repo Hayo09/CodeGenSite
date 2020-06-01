@@ -3,17 +3,20 @@
 <head>
 	<meta charset= "utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" type="text/css" href="style/transaction.css">
+  <link rel="stylesheet" type="text/css" href="style/transaction.css">
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
 
   <div class="container">
-    <img src="style/logo.png" class="logo">
+    <a href="home.html">
+      <img src="style/logo.png" class="logo">
+    </a>
     <a href="index.html">
       <img src="style/logout.png" class="logout">
     </a>
 
-    <label id="name" for="name">Kimberly van Gelder</label>
+    <p id="name" for="name">-</p>
     <hr>
 
       <div  class="block">
@@ -23,17 +26,16 @@
 
         <p id="label1" class="label">From</p>
         <select id="accounts">
-          <option value="NL50 BLUE 0987 7654 54">NL50 BLUE 0987 7654 54</option>
-          <option value="NL50 BLUE 0987 7654 55">NL50 BLUE 0987 7654 55</option>
+          <option value=""> </option>
         </select>
 
         <p class="label">To</p>
-        <input name="to" type="text" placeholder="NL67 INGB 1234 5678 98" required>
+        <input type="text" name="to" placeholder="NL67 INGB 1234 5678 98" id="to" required>
 
         <p class="label">Amount</p>
-        <input type="number" name="currency-field" min="0.01" step="0.01" placeholder="€1,000,000.00">
+        <input type="number" name="currency-field" min="0.01" max="20000" step="0.01" placeholder="€1,000.00" id="amount">
 
-        <button type="submit" name= "transaction" class="btn">Make transaction</button>
+        <input type="button" name= "transaction" class="btn" id="make_transaction" value="Make transaction">
         <a href="home.html">
             <button id="cancel" class="btn">Cancel</button>
         </a>
@@ -43,3 +45,86 @@
 
 </body>
 </html>
+<script>
+  var loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
+  if(loggedInUser.isactive == "false"){
+    window.location = "index.html"
+  }
+  // if(loggedInUser.typeofuser == "employee" ){
+  //     window.location = "employeehome.html"
+  //   }
+  $(document).ready(function(){
+    $('#name').text(loggedInUser.firstname + " " + loggedInUser.lastname);
+    var accounts = getAccountsByUser(loggedInUser.id)
+    accounts.forEach( account => {
+      var option = document.createElement("option")
+      option.text = account.iban;
+      document.getElementById("accounts").add(option);
+    });
+    $("#make_transaction").click(function(){
+      var amount = document.getElementById("amount").value;
+      if (amount > 20000){
+        alert("Amount is too big");
+        window.location ="transaction.html";
+      }
+      var sender = getAccountByIban($('#accounts').val().trim());
+      var receiver = getAccountByIban(document.getElementById("to").value);
+      var by = loggedInUser;
+      var body = {"sender":sender, "receiver":receiver, "amount":amount, "by":by, "id":0, "date":0};
+      $.ajax({
+        url:'http://localhost:8080/transaction',
+        type:'POST',
+        contentType: "application/json",
+        dataType: "json",
+        async: false,
+			  data:body,
+        success:function(response){
+          window.location = "home.html";
+        },
+        error: function(error){
+				  alert("invalid data");
+        }
+      });
+    });
+  });
+  
+
+  function getAccountsByUser(id) {
+    var accounts = new ArrayBuffer();
+    $.ajax({
+      url:'http://localhost:8080/account/listaccount',
+      type:'GET',
+      contentType: "application/json",
+      dataType: "json",
+      async: false,
+			data:{userId:id},
+      success:function(response){
+        accounts = response;
+      },
+      error: function(error){
+				alert("Invalid user");
+      }
+    });
+    return accounts;
+  };
+
+  function getAccountByIban(id){
+    var iban = id.replace("/ /g", "%20");
+    var account;
+    $.ajax({
+      url:'http://localhost:8080/account/{accountId}',
+      type:'GET',
+      contentType: "application/json",
+      dataType: "json",
+      async: false,
+      data:{iban:iban},
+      success:function(response){
+        account = response;
+      },
+      error: function(error){
+				alert("Account doesn't exist");
+      }
+    });
+    return account;
+  };
+</script>
