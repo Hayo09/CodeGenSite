@@ -45,7 +45,7 @@
 				<hr>
 				<p id="nameChecking" for = "nameChecking"></p>
         <p id="IBANChecking" for = "IBANChecking"></p>
-        <p id="money">€77,90</p>
+        <p id="moneyChecking"></p>
       </div>
 
       <div id="transaction" class="block">
@@ -55,7 +55,7 @@
         <hr>
         <p id="nameSaving" for = "nameSaving"></p>
         <p id="IBANSaving" for = "IBANSaving"></p>
-        <p id="money">€230,55</p>
+        <p id="moneySaving"></p>
 
       </div>
 
@@ -73,13 +73,12 @@
 
 	$(document).ready(function(){
 									$.ajax({
-											url:'http://localhost:8080/account/listaccount/',
+											url:'http://localhost:8080/account/listaccount',
 											type:'get',
 											data:{userId:loggedInUser.id},
 											contentType: "application/json",
 											dataType:"json",
 											success:function(response){
-												alert("first yay!");
 													$.each(response,function(index){
 														 showBalance(response[index]);
 													});
@@ -91,10 +90,18 @@
 			});
 
 	function showBalance (account) {
-		var html '<div class = "block">
-							<p>' account.iban +'</p>
-							<p>' account.balance +'</p>
-							</div>
-				$("info").append(html);
+
+							if (account.typeofaccount == "saving")
+							{
+								$('#IBANSaving').text(account.iban);
+								$('#moneySaving').text("€" + account.balance);
+
+							} else if (account.typeofaccount == "deposit") {
+								$('#IBANChecking').text(account.iban);
+								$('#moneyChecking').text("€" + account.balance);
+							} else
+							{
+								alert("no bank info to show");
+							}
 	}
 </script>
