@@ -4,6 +4,7 @@
 	<meta charset= "utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" type="text/css" href="style/home.css">
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
 
@@ -15,18 +16,18 @@
       <img src="style/logout.png" class="logout">
     </a>
 
-    <label id="name" for="name">Kimberly van Gelder</label>
+    <p id="name" for="name"></p>
     <hr>
 
     <div id="info" class="box">
       <div id="infoBlock" class="block">
         <h3 id="infoText">User information</h3>
-				<button id="userToggle" class="toggle">Toggle User</button>
+				<button id="userToggle" class="toggle"></button>
 				<hr>
-				<p>First name: Kimperley</p>
-				<p>Last name: van Gelder</p>
-				<p>Email: kimvangelder@hotmail.com</p>
-				<p>Password: ************</p>
+				<p id="userFirstName"></p>
+				<p id="userLastName"></p>
+				<p id="userEmail"></p>
+				<p id="userPassword"></p>
       </div>
 
     </div>
@@ -35,20 +36,20 @@
 
       <div class="block">
         <h3 id="text1">Deposit</h3>
-				<button id="accountToggle" class="toggle">Toggle checking account</button>
+				<button id="accountToggle" class="toggle"></button>
         <hr>
-        <p>Kimberly van Gelder</p>
-        <p>NL50 BLUE 0987 7654 54</p>
-        <p id="value">€77,90</p>
+        <p id="nameUser"></p>
+        <p id="depositIban"></p>
+        <p id="depositValue" class="value"></p>
       </div>
 
       <div id="transaction" class="block">
         <h3 id="text1">Saving</h3>
-				<button id="accountToggle" class="toggle">Toggle savings account</button>
+				<button id="accountToggle1" class="toggle"></button>
         <hr>
-        <p>Kimberly van Gelder</p>
-        <p>NL50 BLUE 0987 7654 55</p>
-        <p id="value">€230,55</p>
+        <p id="nameUserSaving"></p>
+        <p id="savingIban"></p>
+        <p id="savingValue" class="value"></p>
 
       </div>
 
@@ -60,3 +61,140 @@
 
 </body>
 </html>
+<script type="text/javascript">
+	var loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
+	$('#name').text(loggedInUser.firstname + " " + loggedInUser.lastname);
+
+	var searchedUser = JSON.parse(sessionStorage.getItem("searchedUser"));
+	$('#userFirstName').text("First name: "+searchedUser.firstname);
+	$('#nameUser').text(searchedUser.firstname + " "+searchedUser.lastname);
+	$('#nameUserSaving').text(searchedUser.firstname + " "+searchedUser.lastname);
+	$('#userLastName').text("Last name: "+searchedUser.lastname);
+	$('#userEmail').text("Email: "+searchedUser.email);
+	checkUserToggle();
+
+	$(document).ready(function(){
+				$.ajax({
+					url:'http://localhost:8080/account/listaccount',
+					type:'get',
+					data:{userId:searchedUser.id},
+					contentType: "application/json",
+					dataType:"json",
+					success:function(response){
+						$.each(response,function(index){
+							fillIban(response[index]);
+						});
+					},
+					error: function(error){
+						alert("There was an error try again");
+					}
+				});
+	});
+
+	$(document).ready(function(){
+		$("#userToggle").click(function(){
+				$.ajax({
+					url:'http://localhost:8080/users/'+searchedUser.id,
+					type:'put',
+					contentType: "application/json",
+					dataType:"json",
+					success:function(response){
+						alert("User status has been changed");
+						sessionStorage.setItem('searchedUser',JSON.stringify(response));
+						location.reload()
+					},
+					error: function(error){
+						alert("There was an error try again");
+					}
+				});
+		});
+	});
+
+	function fillIban(account)
+	{
+		if(account.typeofaccount == "deposit"){
+			$('#depositIban').text(account.iban);
+			$('#depositValue').text("€"+account.balance);
+		}
+		else if (account.typeofaccount == "saving"){
+			$('#savingIban').text(account.iban);
+			$('#savingValue').text("€"+account.balance);
+		}
+		checkAccountToggle(account);
+	}
+
+	$("#accountToggle").click(function(){
+		var iban = $('#depositIban').text().trim();
+		$.ajax({
+						url:'http://localhost:8080/account/'+iban,
+						type:'put',
+						contentType: "application/json",
+						success:function(response){
+							alert("Account status has been changed");
+							location.reload();
+						},
+						error: function(error){
+							alert("There has been an error");
+						}
+					});
+	});
+
+	$("#accountToggle1").click(function(){
+		var iban = $('#savingIban').text().trim();
+		$.ajax({
+						url:'http://localhost:8080/account/'+iban,
+						type:'put',
+						contentType: "application/json",
+						success:function(response){
+							alert("Account status has been changed");
+							location.reload();
+						},
+						error: function(error){
+							alert("There has been an error");
+						}
+					});
+	});
+
+	function checkUserToggle()
+	{
+		if(searchedUser.isactive == true)
+		{
+			$('#userToggle').text("Deactivate user");
+			var user = document.getElementById("userToggle");
+			user.style.backgroundColor = "red";
+		}
+		if(searchedUser.isactive == false)
+		{
+			$('#userToggle').text("Activate user");
+			var user = document.getElementById("userToggle");
+			user.style.backgroundColor = "green";
+		}
+	}
+	function checkAccountToggle(account)
+	{
+		if(account.typeofaccount == "deposit"){
+			if(account.isactive == true){
+				$('#accountToggle').text("Deactivate account");
+				var depositAccount = document.getElementById("accountToggle");
+				depositAccount.style.backgroundColor = "red";
+			}
+			else{
+				$('#accountToggle').text("Activate account");
+				var depositAccount = document.getElementById("accountToggle");
+				depositAccount.style.backgroundColor = "green";
+			}
+		}
+		else if (account.typeofaccount == "saving"){
+			if(account.isactive == true){
+				$('#accountToggle1').text("Deactivate account");
+				var savingAccount = document.getElementById("accountToggle1");
+				savingAccount.style.backgroundColor = "red";
+			}
+			else{
+				$('#accountToggle1').text("Activate account");
+				var savingAccount = document.getElementById("accountToggle1");
+				savingAccount.style.backgroundColor = "green";
+			}
+		}
+	}
+</script>
