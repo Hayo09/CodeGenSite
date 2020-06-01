@@ -96,7 +96,7 @@ body
 {
   float: right;
 }
-#value
+.value
 {
 	float: right;
 	margin-top: -1vw;
@@ -117,6 +117,12 @@ body
 	margin-right: auto;
 }
 #accountToggle
+{
+	margin-left: 17vw;
+	margin-top: -3vw;
+	width: 45%;
+}
+#accountToggle1
 {
 	margin-left: 17vw;
 	margin-top: -3vw;
