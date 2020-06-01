@@ -1,4 +1,3 @@
-
 <!DOCTYPE html5>
 <html lang="en">
 <head>
@@ -6,8 +5,6 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" type="text/css" href="style/index.css">
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
-	</script>
 </head>
 <body>
 
@@ -28,6 +25,7 @@
 
 <script type="text/javascript">
   $(document).ready(function(){
+		sessionStorage.clear();
     $("#login_submit").click(function(){
       var email = $('#email').val().trim();
       var password = $('#password').val().trim();
@@ -38,7 +36,7 @@
           success:function(response){
             var msg = "";
 						sessionStorage.setItem('loggedInUser',JSON.stringify(response));
-            window.location = "home.html";
+            checkUser(response);
             $("#message").html(msg);
           },
           error: function(error){
@@ -47,4 +45,18 @@
         });
     });
   });
+
+	function checkUser(User)
+	{
+		if (User.isactive == false){
+			alert("This user has been deactivated, please contact customer service.");
+			location.reload();
+		}
+		else if(User.typeofuser == "customer"){
+			window.location = "home.html";
+		}
+		else if (User.typeofuser == "employee") {
+			window.location = "employeehome.html";
+		}
+	}
 </script>

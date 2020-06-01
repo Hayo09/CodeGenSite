@@ -4,6 +4,7 @@
 	<meta charset= "utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" type="text/css" href="style/transaction.css">
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
 
@@ -13,7 +14,7 @@
       <img src="style/logout.png" class="logout">
     </a>
 
-    <label id="name" for="name">Kimberly van Gelder</label>
+    <p id="name" for="name"></p>
     <hr>
 
       <div  class="block">
@@ -43,3 +44,8 @@
 
 </body>
 </html>
+
+<script type="text/javascript">
+	var loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
+	$('#name').text(loggedInUser.firstname + " " + loggedInUser.lastname);
+</script>

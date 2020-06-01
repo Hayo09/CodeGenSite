@@ -17,7 +17,7 @@ body
   height: 55vw;
   padding: 2vw;
   background-color: white;
-  overflow: hidden;
+  overflow: auto;
 }
 .logo
 {
@@ -41,6 +41,11 @@ body
   height: 43vw;
   margin: auto;
 }
+#searchBalk
+{
+	margin-left: 20vw;
+	margin-top: 2vw;
+}
 .block
 {
   border-radius: 25px;
@@ -49,6 +54,7 @@ body
   width: 31vw;
   height: auto;
   margin-bottom: 2vw;
+	margin-top: 2vw;
 }
 #text1
 {
@@ -59,6 +65,7 @@ body
     flex-flow: row wrap;
     justify-content: space-between;
     align-content: space-around;
+		height: auto;
 }
 input.search{
     width: 30vw;
@@ -87,4 +94,13 @@ input.submit{
 }
 input.submit:hover{
     opacity: 1;
+}
+.btn{
+	background-color: #4CAF50;
+  color: white;
+  padding: 0.5vw 0.5vw;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  opacity: 0.9;
 }
