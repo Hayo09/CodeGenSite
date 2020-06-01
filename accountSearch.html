@@ -19,10 +19,10 @@
     <p id="name" for="name"></p>
     <hr>
 
-    <div id="searchBar">
+    <form id="searchBar">
         <input type="text" class="search" id="accountIban" placeholder="Search with Iban">
         <input type="submit" class="submit" id="search" value="Search">
-    </div>
+    </form>
 
     <div class="flex-container">
         <div class="box">
@@ -40,18 +40,17 @@
 
 	$(document).ready(function() {
 		$("#search").click(function(){
-			var name = $('#accountIban').val().trim();
+
+			var iban = $('#accountIban').val().trim();
 				$.ajax({
-					url: 'http://localhost:8080/accounts/search',
+					url: 'http://localhost:8080/account/{' + iban + '}',
 					type:'get',
-					data:{name:name},
+					data:{iban:iban},
 					contentType:"application/json",
 					dataType:"json",
 					success:function(response){
 						var message = "";
-						$.each(response, function(index){
-							fillData(response[index]);
-						});
+							fillData(response);
 					},
 					error: function(error){
 						alert("No account found with that Iban")
@@ -62,18 +61,24 @@
 
 	function fillData(account)
 	{
+		if (account.typeofaccount == "deposit"){
+			var type = "Checking";
+		}
+		else if(account.typeofaccount == "saving"){
+			var type = "Savings";
+		}
 		var html = `<div class="block">
-										<h3>` + Account.TypeofaccountEnum `</h3>
+										<h3>` + type + `</h3>
 										<hr>
-										<p>` + getNames(account) `</p>
-										<p>` + Account.iban `</p>
-										<p>` + Account.balance `</p>
-										<button id="` + Account.userId + `" class="btn">Check transactions</button>
+										` + getNames(account) +`
+										<p>Iban: ` + account.iban +`</p>
+										<p>Balance: ` + account.balance +`</p>
+										<button id="` + account.userid + `" class="btn">Check transactions</button>
 								</div>`
 		$("#info").append(html);
 		// Using getNames function to retrieve first and last name of account holder through the saved
 		// userID in account object
-		document.getElementById(Account.userId).addEventListener("click",function(){
+		document.getElementById(account.userid).addEventListener("click",function(){
 			sessionStorage.setItem('foundAccount', JSON.stringify(account));
 			window.location = "transactionView.html";
 		});
@@ -81,26 +86,28 @@
 
 	function getNames(account)
 	{
-		var id = account.userId.val().trim();
+		var names = "<p>Account holder: ";
+		var userid = account.userid;
 			$.ajax({
-				url:'http://localhost:8080/users/search',
+				url:'http://localhost:8080/users/' + account.userid,
 				type:'get',
-				data:{name:name},
+				async: false,
 				contentType: "application/json",
 				dataType:"json",
 				success:function(response){
 					var msg = "";
-					$.each(response,function(index){
-						fillNames(response[index]);
-					});
+					names += fillNames(response);
 				},
 				error: function(error){
 					alert("No user found with that name");
 				}
 			});
+			names += "</p>";
+			return names;
 	}
 
 	function fillNames(user){
-		return user.firstname + " " + user.lastname;
+		var names = user.firstname + " " + user.lastname;
+		return names;
 	}
 </script>
