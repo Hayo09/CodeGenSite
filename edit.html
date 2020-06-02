@@ -9,7 +9,9 @@
 <body>
 
   <div class="container">
-    <img src="style/logo.png" class="logo">
+    <a href="home.html">
+      <img src="style/logo.png" class="logo">
+    </a>
     <a href="index.html">
       <img src="style/logout.png" class="logout">
     </a>
@@ -17,35 +19,35 @@
     <p id="name" for="name"></p>
     <hr>
 
-    <div id="info" class="box">
+    <div id="password_div" class="box">
       <div id="edit" class="block">
         <h3>Change your password</h3>
         <hr>
 
         <label for="psw"><b>Password</b></label>
-        <input type="password" placeholder="Enter a new Password"  required>
+        <input type="password" placeholder="Enter a new Password" id="pw"  required>
 
         <label for="pswConfirm"><b>Confirm Password</b></label>
-        <input type="password" placeholder="Repeat Password" required>
+        <input type="password" placeholder="Repeat Password" id="cpw" required>
 
-        <button type="submit" name= "change_password" class="btn">Change password</button>
+        <input type="button" name= "change_pw" id="change_pw" class="btn" value="Change password">
       </div>
     </div>
 
-    <div class="vl"></div>
+    <div class="vl" id="v1"></div>
 
-    <div id="accounts" class="box">
+    <div id="email_div" class="box">
       <div id="edit" class="block">
         <h3>Change your Email</h3>
         <hr>
 
         <label for="email"><b>Email</b></label>
-        <input type="text" placeholder="Enter a new email"  required>
+        <input type="text" placeholder="Enter a new email" id="email"  required>
 
         <label for="emailConfirm"><b>Confirm email</b></label>
-        <input type="text" placeholder="Repeat new email" required>
+        <input type="text" placeholder="Repeat new email" id="c_email" required>
 
-        <button type="submit" name= "change_email" class="btn">Change email</button>
+        <input type="button" name= "change_email" class="btn" id="change_email" value="Change email">
       </div>
     </div>
 
@@ -56,8 +58,65 @@
 
 </body>
 </html>
-
-<script type="text/javascript">
-	var loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
-	$('#name').text(loggedInUser.firstname + " " + loggedInUser.lastname);
+<script>
+  var loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
+  if(loggedInUser.isactive == "false"){
+    window.location = "index.html";
+  }
+  if(loggedInUser.typeofuser == "employee" ){
+    document.getElementById('email_div').style.display = 'none';
+    document.getElementById('v1').style.display = 'none';
+    document.getElementById('password_div').style.marginLeft = '27.5%';
+  }
+  $(document).ready(function(){
+    $('#name').text(loggedInUser.firstname + " " + loggedInUser.lastname);
+    var userId = loggedInUser.id;
+    var password = loggedInUser.password;
+    var email = loggedInUser.email;
+    $("#change_pw").click(function(){
+      if($('#pw').val() == password){
+        alert("New password can't be the same as the old password")
+        window.location = "edit.html";
+      }
+      else if($('#pw').val() === $('#cpw').val()) {
+        password = $('#pw').val().trim();
+      }
+      $.ajax({
+        url:'http://localhost:8080/users?id='+userId+'&email='+email+'&password='+password,
+        type:'PUT',
+        contentType: "application/json",
+        dataType: "json",
+				//data:{id:userId,email:email,password:password},
+        success:function(response){
+          window.location = "home.html";
+        },
+        error: function(error){
+					alert("Invalid user");
+        }
+      });
+    })
+    $("#change_email").click(function(){
+      if($('#email').val() == email){
+        alert("New email can't be the same as the old email")
+        window.location = "edit.html";
+      }
+      else if($('#email').val() === $('#c_email').val()) {
+        email = $('#email').val().trim();
+      }
+      $.ajax({
+        url:'http://localhost:8080/users?id='+userId+'&email='+email+'&password='+password,
+        type:'PUT',
+        contentType: "application/json",
+        dataType: "json",
+        success:function(response){
+          window.location = "home.html";
+        },
+        error: function(error){
+					alert("Invalid user");
+        }
+      });
+    })
+    
+  });
+  
 </script>
