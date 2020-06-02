@@ -19,10 +19,10 @@
     <p id="name" for="name"></p>
     <hr>
 
-    <form id="searchBar">
+    <div id="searchBar">
         <input type="text" class="search" id="accountIban" placeholder="Search with Iban">
         <input type="submit" class="submit" id="search" value="Search">
-    </form>
+    </div>
 
     <div class="flex-container">
         <div class="box">
@@ -70,23 +70,23 @@
 		var html = `<div class="block">
 										<h3>` + type + `</h3>
 										<hr>
-										` + getNames(account) +`
+										<p>Account holder:` + getNames(account) +`</p>
 										<p>Iban: ` + account.iban +`</p>
-										<p>Balance: ` + account.balance +`</p>
+										<p>Balance: €` + account.balance +`</p>
 										<button id="` + account.userid + `" class="btn">Check transactions</button>
 								</div>`
 		$("#info").append(html);
 		// Using getNames function to retrieve first and last name of account holder through the saved
 		// userID in account object
 		document.getElementById(account.userid).addEventListener("click",function(){
-			sessionStorage.setItem('foundAccount', JSON.stringify(account));
-			window.location = "transactionView.html";
+			sessionStorage.setItem('foundUser', JSON.stringify(account));
+			window.location = "accountInformation.html";
 		});
 	}
 
 	function getNames(account)
 	{
-		var names = "<p>Account holder: ";
+		var names = "";
 		var userid = account.userid;
 			$.ajax({
 				url:'http://localhost:8080/users/' + account.userid,
@@ -96,13 +96,12 @@
 				dataType:"json",
 				success:function(response){
 					var msg = "";
-					names += fillNames(response);
+					names = fillNames(response);
 				},
 				error: function(error){
 					alert("No user found with that name");
 				}
 			});
-			names += "</p>";
 			return names;
 	}
 
