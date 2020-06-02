@@ -3,13 +3,8 @@
 <head>
 	<meta charset= "utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-<<<<<<< HEAD
-  <link rel="stylesheet" type="text/css" href="style/edit.css">
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-=======
 	<link rel="stylesheet" type="text/css" href="style/edit.css">
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
->>>>>>> master
 </head>
 <body>
 
@@ -21,11 +16,7 @@
       <img src="style/logout.png" class="logout">
     </a>
 
-<<<<<<< HEAD
-    <p id="name" for="name">-</p>
-=======
     <p id="name" for="name"></p>
->>>>>>> master
     <hr>
 
     <div id="password_div" class="box">
@@ -67,7 +58,6 @@
 
 </body>
 </html>
-<<<<<<< HEAD
 <script>
   var loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
   if(loggedInUser.isactive == "false"){
@@ -129,10 +119,4 @@
     
   });
   
-=======
-
-<script type="text/javascript">
-	var loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
-	$('#name').text(loggedInUser.firstname + " " + loggedInUser.lastname);
->>>>>>> master
 </script>
