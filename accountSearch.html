@@ -36,6 +36,11 @@
 
 <script type="text/javascript">
 	var loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
+	if(loggedInUser == null){
+    	window.location = "index.html";
+  	} else if (loggedInUser.typeofuser == "customer"){
+    	window.location = "home.html";
+  	}
 	$('#name').text(loggedInUser.firstname + " " + loggedInUser.lastname);
 
 	$(document).ready(function() {
@@ -67,6 +72,16 @@
 		else if(account.typeofaccount == "saving"){
 			var type = "Savings";
 		}
+		if(account.iban == "NL01 INHO 0000 0000 01"){
+			var html = `<div class="block">
+										<h3>Bank Account</h3>
+										<hr>
+										<p>Account holder:` + getNames(account) +`</p>
+										<p>Iban: ` + account.iban +`</p>
+										<p>Balance: €` + account.balance +`</p>
+								</div>`
+		$("#info").append(html);
+		} else {
 		var html = `<div class="block">
 										<h3>` + type + `</h3>
 										<hr>
@@ -76,6 +91,10 @@
 										<button id="` + account.userid + `" class="btn">Check transactions</button>
 								</div>`
 		$("#info").append(html);
+		}
+
+
+		
 		// Using getNames function to retrieve first and last name of account holder through the saved
 		// userID in account object
 		document.getElementById(account.userid).addEventListener("click",function(){

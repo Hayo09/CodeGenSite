@@ -47,12 +47,9 @@
 </html>
 <script>
   var loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
-  if(loggedInUser.isactive == "false"){
-    window.location = "index.html"
+  if(loggedInUser == null){
+    window.location = "index.html";
   }
-  // if(loggedInUser.typeofuser == "employee" ){
-  //     window.location = "employeehome.html"
-  //   }
   $(document).ready(function(){
     $('#name').text(loggedInUser.firstname + " " + loggedInUser.lastname);
     var accounts = getAccountsByUser(loggedInUser.id)
@@ -65,15 +62,15 @@
       var amount = document.getElementById("amount").value;
       if($('#accounts').val().trim() == 0){
         alert("Please choose a bankaccount where you want to send from");
-        window.location ="transaction.html";
+        location.reload();
       }
-      if(document.getElementById("to").value == 0){
+      else if(document.getElementById("to").value == 0){
         alert("Please choose a bankaccount where you want to send to");
-        window.location ="transaction.html";
+        location.reload();
       }
-      if (amount >= 20000 || amount <= 0){
+      else if (amount >= 20000 || amount <= 0){
         alert("Not a valid amount \nPlease choose an amount between 0 and 20000");
-        window.location ="transaction.html";
+        location.reload();
       }
       var sender = getAccountByIban($('#accounts').val().trim());
       var receiver = getAccountByIban(document.getElementById("to").value);
@@ -86,9 +83,17 @@
       transaction["id"] = 0;
       transaction["date"] = 0;
       transaction = JSON.stringify(transaction);
+      if(sender.isactive == false){
+        alert("Sender ccount is not active");
+        location.reload();
+      }
+      else if(receiver.isactive == false){
+        alert("Receiver ccount is not active");
+        location.reload();
+      }
       if(sender.balance - amount < sender.minimumbalance){
-        alert("There is not enough money 0n the bankaccount");
-        window.location = "transaction.html";
+        alert("There is not enough money on the bankaccount");
+        location.reload();
       }
       $.ajax({
         url:'http://localhost:8080/transaction',

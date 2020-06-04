@@ -59,6 +59,11 @@
 
 <script type="text/javascript">
 	var loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
+	if(loggedInUser == null){
+    	window.location = "index.html";
+  	} else if (loggedInUser.typeofuser == "customer"){
+    	window.location = "home.html";
+  	}
 	$('#name').text(loggedInUser.firstname + " " + loggedInUser.lastname);
 
 	var foundAccount = JSON.parse(sessionStorage.getItem("foundUser"));
