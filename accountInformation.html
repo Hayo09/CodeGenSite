@@ -101,25 +101,18 @@
 
 	function showTransactions(transactions)
 	{
+		var html = `<div class="transactions">
+									<p>Transaction date: ` + transactions.date + `</p>
+									<p>Recipient: ` + transactions.receiver.iban + `</p>
+									<p>Amount: €` + transactions.amount + `</p>
+									</div>`
 		if (transactions.sender.typeofaccount == "deposit")
 		{
-			var html = `<div class="transactions">
-										<p>Transaction date: ` + transactions.date + `</p>
-										<p>Recipient: ` + transactions.receiver.iban + `</p>
-										<p>Amount: ` + transactions.amount + `</p>
-										</div>`
-
 			$('#checkingTransactions').append(html);
 		}
 
 		else if(transactions.sender.typeofaccount == "saving")
 		{
-			var html = `<div class="transactions">
-										<p>` + transactions.date + `</p>
-										<p>Recipient: ` + transactions.receiver.iban + `</p>
-										<p>Amount: ` + transactions.amount + `</p>
-										</div>`
-
 			$('#savingsTransactions').append(html);
 		}
 	}

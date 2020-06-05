@@ -53,8 +53,7 @@
 </html>
 
 <script type="text/javascript">
-	//var loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
-  var loggedInUser = {typeofuser:"employee", firstname:"Hayo", lastname:"Bos"};
+	var loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
 
   if (loggedInUser.typeofuser === "employee"){
 	   $('#name').text(loggedInUser.firstname + " " + loggedInUser.lastname);
