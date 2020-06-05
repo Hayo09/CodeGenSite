@@ -109,7 +109,11 @@ body
 {
   margin-top: -0.5vw;
 }
-#money
+#moneySaving
+{
+  float: right;
+}
+#moneyChecking
 {
   float: right;
 }

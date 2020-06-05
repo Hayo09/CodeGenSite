@@ -21,32 +21,14 @@
 
     <div id="info" class="box">
       <div id="infoBlock" class="block">
-        <h3 id="infoText">Checking account</h3>
+        <h3 id="checkingAccHeader"></h3>
 				<hr>
 					<div class="scrollTransaction">
-						<div class="transactions">
-							<p>NL78 INHO 0876 6789 54 </p>
-							<p>Amount: -€23,88</p>
-						</div>
-						<div class="transactions">
-							<p>NL78 INHO 0876 6789 54 </p>
-							<p>Amount: -€23,88</p>
-						</div>
-						<div class="transactions">
-							<p>NL78 INHO 0876 6789 54 </p>
-							<p>Amount: -€23,88</p>
-						</div>
-						<div class="transactions">
-							<p>NL78 INHO 0876 6789 54 </p>
-							<p>Amount: -€23,88</p>
-						</div>
-						<div class="transactions">
-							<p>NL78 INHO 0876 6789 54 </p>
-							<p>Amount: -€23,88</p>
+						<div id = "checkingTransactions">
 						</div>
 					</div>
 					<hr>
-					<p id="totalAmount"> Amount: €203,88<p>
+					<p id="totalAmountChecking"><p>
       </div>
 
     </div>
@@ -56,32 +38,14 @@
     <div id="accounts" class="box">
 
 	      <div id="infoBlock" class="block">
-	        <h3 id="infoText">Savings account</h3>
+	        <h3 id="savingsAccHeader"></h3>
 					<hr>
 					<div class="scrollTransaction">
-						<div class="transactions">
-							<p>NL78 INHO 0876 6789 54 </p>
-							<p>Amount: -€23,88</p>
-						</div>
-						<div class="transactions">
-							<p>NL78 INHO 0876 6789 54 </p>
-							<p>Amount: -€23,88</p>
-						</div>
-						<div class="transactions">
-							<p>NL78 INHO 0876 6789 54 </p>
-							<p>Amount: -€23,88</p>
-						</div>
-						<div class="transactions">
-							<p>NL78 INHO 0876 6789 54 </p>
-							<p>Amount: -€23,88</p>
-						</div>
-						<div class="transactions">
-							<p>NL78 INHO 0876 6789 54 </p>
-							<p>Amount: -€23,88</p>
+						<div id = "savingsTransactions">
 						</div>
 					</div>
 					<hr>
-					<p id="totalAmount"> Amount: €203,88<p>
+					<p id="totalAmountSaving"><p>
 	      </div>
 
   </div>
@@ -95,5 +59,91 @@
 
 <script type="text/javascript">
 	var loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
+	if(loggedInUser == null){
+    	window.location = "index.html";
+  	} else if (loggedInUser.typeofuser == "customer"){
+    	window.location = "home.html";
+  	}
 	$('#name').text(loggedInUser.firstname + " " + loggedInUser.lastname);
+
+	var foundAccount = JSON.parse(sessionStorage.getItem("foundUser"));
+	getAccounts(foundAccount);
+	getTransactions(foundAccount);
+
+	function getAccounts(account)
+	{
+		var userid = account.userid;
+			$.ajax({
+				url: 'http://localhost:8080/account/listaccount?userId=' + account.userid,
+				type:'GET',
+				async: false,
+				contentType: "application/json",
+				dataType:"json",
+				success:function(response){
+					var msg = "";
+					$.each(response, function(index){
+						fillHeaders(response[index]);
+					});
+				},
+				error: function(error){
+					alert("There was an error, try again");
+				}
+			});
+	}
+	function fillHeaders(account){
+		if (account.typeofaccount == "deposit") {
+			$('#checkingAccHeader').text("Checking: " + account.iban);
+		}
+		else if(account.typeofaccount == "saving"){
+			$('#savingsAccHeader').text("Saving: " + account.iban);
+		}
+	}
+
+	function showTransactions(transactions)
+	{
+		if (transactions.sender.typeofaccount == "deposit")
+		{
+			var html = `<div class="transactions">
+										<p>Transaction date: ` + transactions.date + `</p>
+										<p>Recipient: ` + transactions.receiver.iban + `</p>
+										<p>Amount: ` + transactions.amount + `</p>
+										</div>`
+
+			$('#checkingTransactions').append(html);
+		}
+
+		else if(transactions.sender.typeofaccount == "saving")
+		{
+			var html = `<div class="transactions">
+										<p>` + transactions.date + `</p>
+										<p>Recipient: ` + transactions.receiver.iban + `</p>
+										<p>Amount: ` + transactions.amount + `</p>
+										</div>`
+
+			$('#savingsTransactions').append(html);
+		}
+	}
+
+	function getTransactions(account)
+	{
+		var iban = account.iban;
+			$.ajax({
+				url: 'http://localhost:8080/transaction/account/{accountId}?acountId=' + account.iban,
+				type: 'GET',
+				async: false,
+				contentType: "application/json",
+				dataType: "json",
+				success:function(response){
+					var msg = "";
+					$.each(response, function(index){
+						showTransactions(response[index]);
+					});
+				},
+				error: function(error){
+					alert("There was an error loading transactions");
+				}
+			});
+	}
+
+
 </script>

@@ -16,7 +16,8 @@
       <img src="style/logout.png" class="logout">
     </a>
 
-    <p id="name" for="name"></p>
+	<p id="name" for="name"></p>
+	<div id="navbar"></div>
     <hr>
 
     <div id="info" class="box">
@@ -43,9 +44,9 @@
         <h3 id="text1">Checking</h3>
 				</a>
 				<hr>
-        <p>Kimberly van Gelder</p>
-        <p>NL50 BLUE 0987 7654 54</p>
-        <p id="money">€77,90</p>
+				<p id="nameChecking" for = "nameChecking"></p>
+        <p id="IBANChecking" for = "IBANChecking"></p>
+        <p id="moneyChecking"></p>
       </div>
 
       <div id="transaction" class="block">
@@ -53,9 +54,9 @@
         <h3 id="text1">Saving</h3>
 			</a>
         <hr>
-        <p>Kimberly van Gelder</p>
-        <p>NL50 BLUE 0987 7654 55</p>
-        <p id="money">€230,55</p>
+        <p id="nameSaving" for = "nameSaving"></p>
+        <p id="IBANSaving" for = "IBANSaving"></p>
+        <p id="moneySaving"></p>
 
       </div>
 
@@ -67,5 +68,51 @@
 
 <script type="text/javascript">
 	var loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
+	if(loggedInUser == null){
+    	window.location = "index.html";
+  	}
 	$('#name').text(loggedInUser.firstname + " " + loggedInUser.lastname);
+	$('#nameChecking').text(loggedInUser.firstname + " " + loggedInUser.lastname);
+	$('#nameSaving').text(loggedInUser.firstname + " " + loggedInUser.lastname);
+	if(loggedInUser.typeofuser == "employee"){
+		var html =  `<nav">
+										<a href="home.html">Home</a> |
+										<a href="employeehome.html">Employee Home</a>
+								</nav>`
+		$("#navbar").append(html);
+	}
+
+	$(document).ready(function(){
+									$.ajax({
+											url:'http://localhost:8080/account/listaccount',
+											type:'get',
+											data:{userId:loggedInUser.id},
+											contentType: "application/json",
+											dataType:"json",
+											success:function(response){
+													$.each(response,function(index){
+														 showBalance(response[index]);
+													});
+											},
+											error: function(error){
+													alert("There was an error try again");
+											}
+									});
+			});
+
+	function showBalance (account) {
+
+							if (account.typeofaccount == "saving")
+							{
+								$('#IBANSaving').text(account.iban);
+								$('#moneySaving').text("€" + account.balance);
+
+							} else if (account.typeofaccount == "deposit") {
+								$('#IBANChecking').text(account.iban);
+								$('#moneyChecking').text("€" + account.balance);
+							} else
+							{
+								alert("no bank info to show");
+							}
+	}
 </script>

@@ -36,6 +36,11 @@
 </html>
 <script type="text/javascript">
 	var loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser"));
+	if(loggedInUser == null){
+    	window.location = "index.html";
+  	} else if (loggedInUser.typeofuser == "customer"){
+    	window.location = "home.html";
+  	}
 	$('#name').text(loggedInUser.firstname + " " + loggedInUser.lastname);
 	
   $(document).ready(function(){
@@ -63,6 +68,10 @@
 
 	function fillData(Users)
 	{
+		if(Users.id == 53){
+			alert("Forbidden User");
+		} else{
+
 		var html =  `<div class="block">
 										<h3>`	+ Users.firstname + " " + Users.lastname+`</h3>
 										<hr>
@@ -71,6 +80,7 @@
 										<button id="`	+ Users.id +`" class="btn">Check user information</button>
 								</div>`
 		$("#info").append(html);
+		}
 
 		document.getElementById(Users.id).addEventListener("click",function(){
 				sessionStorage.setItem('searchedUser',JSON.stringify(Users));
