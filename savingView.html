@@ -128,7 +128,7 @@
 					var html = `<div Class="transactions">
 											<p>`+ transaction.date + `</p>
 											<p>`+ "to: " + transaction.receiver.iban + `</p>
-					 						<p>` + "-" + transaction.amount + `</p>
+					 						<p>` + "€-" + transaction.amount + `</p>
 											</div>`
 					$('#transactionview').append(html);
 			} else if (transaction.receiver.typeofaccount == "saving")
@@ -136,7 +136,7 @@
 				var html = `<div Class="transactions">
 										<p>`+ transaction.date + `</p>
 										<p>`+ "from: " + transaction.sender.iban + `</p>
-										<p> ` + "+" + transaction.amount + `</p>
+										<p> ` + "€+" + transaction.amount + `</p>
 										</div>`
 				$('#transactionview').append(html);
 			} else
