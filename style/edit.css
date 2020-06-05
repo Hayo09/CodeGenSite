@@ -50,11 +50,11 @@ body
   border-left: 0.1vw solid black;
   height: 35vw;
 }
-#accounts
+#email_div
 {
   float:right;
 }
-#info
+#password_div
 {
   float: left;
 }
